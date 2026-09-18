@@ -17,7 +17,7 @@ export default function App() {
 
   useEffect(() => {
     setCompareItems([])
-    setActiveSection('overview')
+    setActiveSection('priceComparison')
   }, [selectedId])
 
   const toggleCompare = item => setCompareItems(prev => {
@@ -61,7 +61,7 @@ export default function App() {
           onShowDiag={() => setDiagDrug(drug)}
         />
 
-        {(activeSection === 'competitors' || activeSection === 'generics') && (
+        {(activeSection === 'priceComparison' || activeSection === 'competitors' || activeSection === 'generics') && (
           <CompareTray
             items={compareItems}
             referencePrice={drug.prices[0]?.insurancePrice ?? 0}
@@ -85,7 +85,7 @@ export default function App() {
 }
 
 const SECTION_TABS = [
-  { key: 'overview', label: '요약', icon: '▦' },
+  { key: 'priceComparison', label: '가격 비교', icon: '⚖️' },
   { key: 'price', label: '약가', icon: '💰' },
   { key: 'approval', label: '허가사항', icon: '📋' },
   { key: 'reimbursement', label: '보험급여', icon: '📊' },
@@ -130,7 +130,14 @@ function TopBar({ activeSection, onSelect, color }) {
 }
 
 function SectionContent({ activeSection, drug, allDrugs, copayRate, setCopayRate, compareItems, onToggleCompare, onShowDiag }) {
-  if (activeSection === 'overview') return <OverviewSection drug={drug} />
+  if (activeSection === 'priceComparison') return <PriceComparisonSection
+    drug={drug}
+    allDrugs={allDrugs}
+    copayRate={copayRate}
+    setCopayRate={setCopayRate}
+    compareItems={compareItems}
+    onToggleCompare={onToggleCompare}
+  />
 
   if (activeSection === 'price') {
     return <PriceSection
@@ -157,28 +164,33 @@ function SectionContent({ activeSection, drug, allDrugs, copayRate, setCopayRate
   />
 }
 
-function OverviewSection({ drug }) {
-  const price = drug.prices[0]
-  const criteriaCount = Array.isArray(drug.reimbursementCriteria)
-    ? drug.reimbursementCriteria.reduce((sum, section) => sum + (section.items?.length ?? 0), 0)
-    : 0
-
-  const cards = [
-    { icon: '💰', label: '대표 보험급여가', value: price?.pricingStatus === '비급여' ? '비급여' : `${price?.insurancePrice?.toLocaleString('ko-KR') ?? '-'}원`, hint: price?.spec ?? '기준 규격' },
-    { icon: '⚔️', label: '경쟁 오리지널', value: `${drug.competitors?.length ?? 0} 품목`, hint: '가격·제품 비교 가능' },
-    { icon: '🏭', label: '제네릭', value: `${drug.generics?.length ?? 0} 품목`, hint: criteriaCount ? `급여 기준 ${criteriaCount}개 항목` : '동일성분 제품' },
-  ]
-
+function PriceComparisonSection({ drug, allDrugs, copayRate, setCopayRate, compareItems, onToggleCompare }) {
   return (
-    <div className="overview-grid">
-      {cards.map(card => (
-        <div className="overview-card" key={card.label}>
-          <span className="overview-card-icon">{card.icon}</span>
-          <span className="overview-card-label">{card.label}</span>
-          <strong className="overview-card-value" style={{ color: drug.color }}>{card.value}</strong>
-          <span className="overview-card-hint">{card.hint}</span>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+      <div className="section-intro">
+        <div>
+          <div className="section-intro-title">⚖️ 가격 비교</div>
+          <div className="section-intro-text">{drug.name}을 기준으로 경쟁 오리지널과 제네릭의 보험급여가·본인부담금을 비교합니다.</div>
         </div>
-      ))}
+        <span className="section-intro-badge">비교 기준: {drug.prices[0]?.spec ?? '대표 규격'}</span>
+      </div>
+      <PriceSection
+        drug={drug}
+        copayRate={copayRate}
+        setCopayRate={setCopayRate}
+        compareItems={compareItems}
+        onToggleCompare={onToggleCompare}
+      />
+      <CompetitorSection
+        key={`${drug.id}-comparison`}
+        drug={drug}
+        allDrugs={allDrugs}
+        copayRate={copayRate}
+        setCopayRate={setCopayRate}
+        compareItems={compareItems}
+        onToggleCompare={onToggleCompare}
+        mode="all"
+      />
     </div>
   )
 }
