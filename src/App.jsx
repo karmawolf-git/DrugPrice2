@@ -96,36 +96,36 @@ export default function App() {
 
 function TopBar({ drug, drugs, selectedId, onSelect }) {
   return (
-    <div style={{
-      display: 'flex',
-      alignItems: 'center',
-      gap: 8,
-      flexWrap: 'wrap',
-    }}>
-      {drugs.map((d, i) => (
-        <React.Fragment key={d.id}>
-          <button
-            onClick={() => onSelect(d.id)}
-            style={{
-              padding: '6px 14px',
-              borderRadius: 20,
-              border: selectedId === d.id ? `2px solid ${d.color}` : '2px solid var(--border)',
-              background: selectedId === d.id ? d.color : 'var(--surface)',
-              color: selectedId === d.id ? '#fff' : 'var(--text-secondary)',
-              fontWeight: selectedId === d.id ? 700 : 400,
-              fontSize: 13,
-              cursor: 'pointer',
-              transition: 'all 0.15s',
-              fontFamily: 'inherit',
-            }}
-          >
-            {d.name}
-          </button>
-          {i < drugs.length - 1 && (
-            <span style={{ color: 'var(--border)', fontSize: 12 }}>›</span>
-          )}
-        </React.Fragment>
-      ))}
+    <div className="product-switcher">
+      <div className="product-switcher-heading">
+        <div>
+          <div className="product-switcher-label">제품 선택</div>
+          <div className="product-switcher-hint">비교할 제품을 선택하세요</div>
+        </div>
+        <div className="product-switcher-current" style={{ color: drug.color }}>
+          <span className="product-switcher-dot" style={{ background: drug.color }} />
+          현재 보고 있는 제품: <strong>{drug.name}</strong>
+        </div>
+      </div>
+
+      <div className="product-tabs" role="tablist" aria-label="제품 선택">
+        {drugs.map(d => {
+          const active = selectedId === d.id
+          return (
+            <button
+              key={d.id}
+              role="tab"
+              aria-selected={active}
+              onClick={() => onSelect(d.id)}
+              className={`product-tab${active ? ' is-active' : ''}`}
+              style={active ? { '--tab-color': d.color, '--tab-bg': d.lightColor } : {}}
+            >
+              <span className="product-tab-name">{d.name}</span>
+              <span className="product-tab-meta">{d.manufacturer}</span>
+            </button>
+          )
+        })}
+      </div>
     </div>
   )
 }

@@ -35,6 +35,126 @@ html, body {
   height: 100%;
 }
 
+.product-switcher {
+  position: sticky;
+  top: -20px;
+  z-index: 10;
+  padding: 12px 0 14px;
+  background: var(--bg);
+}
+
+.product-switcher-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 10px;
+}
+
+.product-switcher-label {
+  color: var(--text-primary);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.product-switcher-hint {
+  color: var(--text-muted);
+  font-size: 11px;
+  margin-top: 1px;
+}
+
+.product-switcher-current {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  white-space: nowrap;
+}
+
+.product-switcher-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+}
+
+.product-tabs {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 3px;
+  scrollbar-width: thin;
+}
+
+.product-tab {
+  flex: 1 1 0;
+  min-width: 150px;
+  padding: 10px 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-family: inherit;
+  text-align: left;
+  transition: border-color 0.15s, background 0.15s, box-shadow 0.15s, transform 0.15s;
+}
+
+.product-tab:hover {
+  border-color: var(--border-hover);
+  transform: translateY(-1px);
+}
+
+.product-tab.is-active {
+  border: 2px solid var(--tab-color);
+  padding: 9px 13px;
+  background: var(--tab-bg);
+  color: var(--tab-color);
+  box-shadow: 0 3px 8px color-mix(in srgb, var(--tab-color) 18%, transparent);
+}
+
+.product-tab-name,
+.product-tab-meta {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.product-tab-name {
+  font-size: 14px;
+  font-weight: 750;
+}
+
+.product-tab-meta {
+  margin-top: 3px;
+  color: var(--text-muted);
+  font-size: 11px;
+}
+
+.product-tab.is-active .product-tab-meta {
+  color: color-mix(in srgb, var(--tab-color) 70%, var(--text-primary));
+}
+
+@media (max-width: 700px) {
+  .product-switcher {
+    top: -20px;
+  }
+
+  .product-switcher-heading {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .product-switcher-current {
+    font-size: 10px;
+  }
+
+  .product-tab {
+    flex: 0 0 170px;
+  }
+}
+
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
