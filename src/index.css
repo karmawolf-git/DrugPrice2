@@ -168,6 +168,31 @@ html, body {
   white-space: nowrap;
 }
 
+.comparison-only-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.comparison-empty-state {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  gap: 5px;
+  padding: 40px 20px;
+  background: var(--surface);
+  border: 1px dashed var(--border-hover);
+  border-radius: var(--radius);
+  color: var(--text-secondary);
+  font-size: 13px;
+  text-align: center;
+}
+
+.comparison-empty-icon {
+  margin-bottom: 4px;
+  font-size: 24px;
+}
+
 @media (max-width: 700px) {
   .product-switcher {
     top: -20px;

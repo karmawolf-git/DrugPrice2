@@ -131,11 +131,7 @@ function TopBar({ activeSection, onSelect, color }) {
 function SectionContent({ activeSection, drug, allDrugs, copayRate, setCopayRate, compareItems, onToggleCompare, onShowDiag }) {
   if (activeSection === 'priceComparison') return <PriceComparisonSection
     drug={drug}
-    allDrugs={allDrugs}
-    copayRate={copayRate}
-    setCopayRate={setCopayRate}
     compareItems={compareItems}
-    onToggleCompare={onToggleCompare}
   />
 
   if (activeSection === 'price') {
@@ -169,26 +165,23 @@ function SectionContent({ activeSection, drug, allDrugs, copayRate, setCopayRate
   />
 }
 
-function PriceComparisonSection({ drug, allDrugs, copayRate, setCopayRate, compareItems, onToggleCompare }) {
+function PriceComparisonSection({ drug, compareItems }) {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+    <div className="comparison-only-panel">
       <div className="section-intro">
         <div>
-          <div className="section-intro-title">⚖️ 가격 비교</div>
-          <div className="section-intro-text">{drug.name}을 기준으로 경쟁 오리지널과 제네릭의 보험급여가·본인부담금을 비교합니다.</div>
+          <div className="section-intro-title">⚖️ 선택 항목 가격 비교</div>
+          <div className="section-intro-text">경쟁 오리지널 또는 제네릭 탭에서 선택한 항목만 비교합니다.</div>
         </div>
-        <span className="section-intro-badge">비교 기준: {drug.prices[0]?.spec ?? '대표 규격'}</span>
+        <span className="section-intro-badge">기준 제품: {drug.name}</span>
       </div>
-      <CompetitorSection
-        key={`${drug.id}-comparison`}
-        drug={drug}
-        allDrugs={allDrugs}
-        copayRate={copayRate}
-        setCopayRate={setCopayRate}
-        compareItems={compareItems}
-        onToggleCompare={onToggleCompare}
-        mode="all"
-      />
+      {!compareItems.length && (
+        <div className="comparison-empty-state">
+          <div className="comparison-empty-icon">☑️</div>
+          <strong>비교할 항목이 없습니다</strong>
+          <span>경쟁 오리지널 또는 제네릭 탭에서 비교할 제품을 선택해 주세요.</span>
+        </div>
+      )}
     </div>
   )
 }
