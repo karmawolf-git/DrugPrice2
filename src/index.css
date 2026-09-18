@@ -408,7 +408,6 @@ html, body {
 
 .compare-result-diff.is-lower { background: #ecfdf5; }
 .compare-result-diff.is-higher { background: #fff7ed; }
-}
 
 @media (max-width: 700px) {
   .product-switcher {
