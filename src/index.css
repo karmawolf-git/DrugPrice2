@@ -193,6 +193,186 @@ html, body {
   font-size: 24px;
 }
 
+.compare-tray {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 18px 20px;
+  background: var(--surface);
+  color: var(--text-primary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+}
+
+.compare-tray-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.compare-tray-title {
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.compare-tray-subtitle {
+  margin-top: 2px;
+  color: var(--text-muted);
+  font-size: 11px;
+}
+
+.compare-tray-clear {
+  padding: 5px 10px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--surface);
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 11px;
+}
+
+.compare-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.compare-summary-card {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-height: 92px;
+  padding: 11px 13px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface-2);
+}
+
+.compare-summary-card span,
+.compare-summary-card small {
+  color: var(--text-muted);
+  font-size: 10px;
+}
+
+.compare-summary-card strong {
+  margin-top: 4px;
+  color: var(--text-primary);
+  font-size: 18px;
+  line-height: 1.2;
+}
+
+.compare-summary-card.is-green strong { color: #047857; }
+.compare-summary-card.is-blue strong { color: #0369a1; }
+
+.compare-result-list {
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+}
+
+.compare-result-heading,
+.compare-result-row {
+  display: grid;
+  grid-template-columns: minmax(210px, 1.4fr) 110px 130px minmax(300px, 1.7fr);
+  align-items: center;
+  gap: 12px;
+}
+
+.compare-result-heading {
+  padding: 9px 12px;
+  background: var(--surface-2);
+  color: var(--text-secondary);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.compare-result-row {
+  min-height: 82px;
+  padding: 12px;
+  border-top: 1px solid var(--border);
+  background: var(--surface);
+}
+
+.compare-result-row:nth-child(odd) { background: #fcfdff; }
+.compare-result-row.is-cheapest { box-shadow: inset 4px 0 #10b981; }
+
+.compare-result-name {
+  font-size: 13px;
+  font-weight: 750;
+}
+
+.compare-result-meta {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex-wrap: wrap;
+  margin-top: 5px;
+  color: var(--text-muted);
+  font-size: 10px;
+}
+
+.compare-type-badge,
+.compare-cheapest-badge {
+  padding: 2px 6px;
+  border-radius: 8px;
+  font-weight: 700;
+}
+
+.compare-type-badge.is-generic { background: #dcfce7; color: #166534; }
+.compare-type-badge.is-competitor { background: #fef3c7; color: #92400e; }
+.compare-cheapest-badge { background: #d1fae5; color: #047857; }
+
+.compare-result-price {
+  color: var(--text-primary);
+  font-size: 16px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.compare-result-diff {
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.compare-result-diff small {
+  display: block;
+  margin-top: 2px;
+  font-size: 10px;
+  font-weight: 500;
+}
+
+.compare-result-diff.is-lower { color: #059669; }
+.compare-result-diff.is-higher { color: #d97706; }
+
+.compare-cost-chips {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(70px, 1fr));
+  gap: 5px;
+}
+
+.compare-cost-chip {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 5px 6px;
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  background: var(--surface-2);
+  color: var(--text-primary);
+  font-size: 10px;
+  white-space: nowrap;
+}
+
+.compare-cost-chip b {
+  color: var(--text-muted);
+  font-size: 9px;
+}
+
 @media (max-width: 700px) {
   .product-switcher {
     top: -20px;
@@ -216,6 +396,19 @@ html, body {
     align-items: flex-start;
     flex-direction: column;
     gap: 8px;
+  }
+
+  .compare-summary-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .compare-result-list {
+    overflow-x: auto;
+  }
+
+  .compare-result-heading,
+  .compare-result-row {
+    min-width: 820px;
   }
 }
 

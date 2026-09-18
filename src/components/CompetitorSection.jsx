@@ -838,53 +838,81 @@ export default function CompetitorSection({ drug, allDrugs, copayRate = 0.3, set
 
 export function CompareTray({ items, referencePrice, copayRate = 0.3, onClear }) {
   if (!items.length) return null
+
+  const pricedItems = items.filter(item => item.pricingStatus !== '비급여' && Number.isFinite(item.insurancePrice))
+  const cheapest = pricedItems.length ? Math.min(...pricedItems.map(item => item.insurancePrice)) : null
+  const maxSaving = cheapest != null ? referencePrice - cheapest : null
+  const lowestCopay30 = pricedItems.length
+    ? Math.min(...pricedItems.map(item => Math.round(item.insurancePrice * 30 * copayRate)))
+    : null
+
   return (
-    <section style={{ background: 'var(--surface)', color: 'var(--text-primary)', border: '1px solid var(--border)', borderRadius: 'var(--radius)', padding: '16px 20px', boxShadow: 'var(--shadow-sm)' }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
-        <span style={{ fontWeight: 800 }}>⚖️ 선택 항목 비교</span>
-        <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>{items.length}개 선택</span>
-        <button onClick={onClear} style={{ marginLeft: 'auto', border: 0, background: 'transparent', color: 'var(--text-secondary)', cursor: 'pointer', fontFamily: 'inherit' }}>전체 해제</button>
+    <section className="compare-tray">
+      <div className="compare-tray-header">
+        <div>
+          <div className="compare-tray-title">⚖️ 선택 항목 가격 비교</div>
+          <div className="compare-tray-subtitle">선택한 제품의 가격과 기준 제품 대비 차이를 비교합니다.</div>
+        </div>
+        <button onClick={onClear} className="compare-tray-clear">전체 해제</button>
       </div>
-      <div style={{ overflowX: 'auto', border: '1px solid var(--border)', borderRadius: 8 }}>
-        <table style={{ width: '100%', minWidth: 920, borderCollapse: 'collapse', fontSize: 12 }}>
-          <thead>
-            <tr style={{ background: 'var(--surface-2)', color: 'var(--text-secondary)', textAlign: 'left' }}>
-              {['구분', '제품명', '제조사', '규격', '보험급여가', '우리 제품 대비', '30일 본인부담', '90일 본인부담', '120일 본인부담', '1년 본인부담'].map(label => (
-                <th key={label} style={{ padding: '9px 10px', whiteSpace: 'nowrap', fontWeight: 600 }}>{label}</th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {items.map(item => {
-              const diff = item.pricingStatus === '비급여' ? null : item.insurancePrice - referencePrice
-              return (
-                <tr key={item.compareKey} style={{ borderTop: '1px solid var(--border)' }}>
-                  <td style={{ padding: '10px', color: 'var(--text-secondary)', whiteSpace: 'nowrap' }}>{item.type}</td>
-                  <td style={{ padding: '10px', fontWeight: 700, maxWidth: 220 }}>{item.name}</td>
-                  <td style={{ padding: '10px', color: 'var(--text-secondary)', whiteSpace: 'nowrap' }}>{item.manufacturer ?? '-'}</td>
-                  <td style={{ padding: '10px', color: 'var(--text-secondary)', whiteSpace: 'nowrap' }}>{item.spec ?? item.specKey ?? '-'}</td>
-                  <td style={{ padding: '10px', fontWeight: 700, whiteSpace: 'nowrap' }}>{fmt(item.insurancePrice, item.pricingStatus)}</td>
-                  <td style={{ padding: '10px', color: diff < 0 ? '#059669' : diff > 0 ? '#d97706' : 'var(--text-muted)', whiteSpace: 'nowrap' }}>
-                    {diff == null ? '비교 불가(비급여)' : diff === 0 ? '동일' : `${diff > 0 ? '+' : ''}${diff.toLocaleString()}원`}
-                  </td>
-                  {[30, 90, 120, 365].map(days => {
-                    const copay = Math.round(item.insurancePrice * days * copayRate)
-                    const referenceCopay = Math.round(referencePrice * days * copayRate)
-                    const copayDiff = copay - referenceCopay
-                    return (
-                      <td key={days} style={{ padding: '8px 10px', whiteSpace: 'nowrap' }}>
-                        <div style={{ color: 'var(--text-primary)' }}>{item.pricingStatus === '비급여' ? '비급여' : `${copay.toLocaleString()}원`}</div>
-                        <div style={{ marginTop: 2, fontSize: 10, color: copayDiff < 0 ? '#059669' : copayDiff > 0 ? '#d97706' : 'var(--text-muted)' }}>
-                          {item.pricingStatus === '비급여' ? '비교 불가' : copayDiff === 0 ? '동일' : `${copayDiff > 0 ? '+' : ''}${copayDiff.toLocaleString()}원`}
-                        </div>
-                      </td>
-                    )
-                  })}
-                </tr>
-              )
-            })}
-          </tbody>
-        </table>
+
+      <div className="compare-summary-grid">
+        <div className="compare-summary-card">
+          <span>선택 항목</span>
+          <strong>{items.length}개</strong>
+          <small>비교 중</small>
+        </div>
+        <div className="compare-summary-card is-green">
+          <span>선택 항목 최저가</span>
+          <strong>{cheapest == null ? '비교 불가' : `${cheapest.toLocaleString('ko-KR')}원`}</strong>
+          <small>{cheapest == null ? '비급여 항목만 선택됨' : '보험급여가 기준'}</small>
+        </div>
+        <div className="compare-summary-card is-green">
+          <span>최대 절감액</span>
+          <strong>{maxSaving == null ? '비교 불가' : `${maxSaving.toLocaleString('ko-KR')}원`}</strong>
+          <small>기준 제품 대비</small>
+        </div>
+        <div className="compare-summary-card is-blue">
+          <span>30일 본인부담 최저</span>
+          <strong>{lowestCopay30 == null ? '비교 불가' : `${lowestCopay30.toLocaleString('ko-KR')}원`}</strong>
+          <small>{Math.round(copayRate * 100)}% 기준</small>
+        </div>
+      </div>
+
+      <div className="compare-result-list">
+        <div className="compare-result-heading">
+          <span>제품</span><span>보험급여가</span><span>기준 제품 대비</span><span>처방기간별 본인부담</span>
+        </div>
+        {items.map(item => {
+          const diff = item.pricingStatus === '비급여' ? null : item.insurancePrice - referencePrice
+          const isCheapest = cheapest != null && item.insurancePrice === cheapest
+          const isLower = diff != null && diff < 0
+          const isHigher = diff != null && diff > 0
+          return (
+            <div className={`compare-result-row${isCheapest ? ' is-cheapest' : ''}`} key={item.compareKey}>
+              <div className="compare-result-product">
+                <div className="compare-result-name">{item.name}</div>
+                <div className="compare-result-meta">
+                  <span className={`compare-type-badge ${item.type === '제네릭' ? 'is-generic' : 'is-competitor'}`}>{item.type}</span>
+                  <span>{item.manufacturer ?? '-'}</span>
+                  <span>{item.spec ?? item.specKey ?? '-'}</span>
+                  {isCheapest && <span className="compare-cheapest-badge">최저가</span>}
+                </div>
+              </div>
+              <div className="compare-result-price">{fmt(item.insurancePrice, item.pricingStatus)}</div>
+              <div className={`compare-result-diff ${isLower ? 'is-lower' : isHigher ? 'is-higher' : ''}`}>
+                {diff == null ? '비교 불가' : diff === 0 ? '동일' : `${diff > 0 ? '▲ +' : '▼ -'}${Math.abs(diff).toLocaleString('ko-KR')}원`}
+                {diff != null && referencePrice > 0 && diff !== 0 && <small>{Math.round(Math.abs(diff) / referencePrice * 100)}%</small>}
+              </div>
+              <div className="compare-cost-chips">
+                {[30, 90, 120, 365].map(days => {
+                  const copay = item.pricingStatus === '비급여' ? null : Math.round(item.insurancePrice * days * copayRate)
+                  return <span key={days} className="compare-cost-chip"><b>{days === 365 ? '1년' : `${days}일`}</b>{copay == null ? '비급여' : `${copay.toLocaleString('ko-KR')}원`}</span>
+                })}
+              </div>
+            </div>
+          )
+        })}
       </div>
     </section>
   )
