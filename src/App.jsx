@@ -61,7 +61,7 @@ export default function App() {
           onShowDiag={() => setDiagDrug(drug)}
         />
 
-        {(activeSection === 'priceComparison' || activeSection === 'competitors' || activeSection === 'generics') && (
+        {activeSection === 'priceComparison' && (
           <CompareTray
             items={compareItems}
             referencePrice={drug.prices[0]?.insurancePrice ?? 0}
