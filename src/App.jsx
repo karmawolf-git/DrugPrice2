@@ -9,7 +9,7 @@ import DiagnosisCodePage from './components/DiagnosisCodePage.jsx'
 
 export default function App() {
   const [selectedId, setSelectedId] = useState(drugs[0].id)
-  const [activeSection, setActiveSection] = useState('overview')
+  const [activeSection, setActiveSection] = useState('price')
   const [diagDrug, setDiagDrug] = useState(null)
   const [copayRate, setCopayRate] = useState(0.3)   // 본인부담률 (약가·경쟁품·제네릭 공유)
   const [compareItems, setCompareItems] = useState([])
@@ -17,7 +17,7 @@ export default function App() {
 
   useEffect(() => {
     setCompareItems([])
-    setActiveSection('priceComparison')
+    setActiveSection('price')
   }, [selectedId])
 
   const toggleCompare = item => setCompareItems(prev => {
