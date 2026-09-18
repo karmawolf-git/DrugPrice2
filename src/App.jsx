@@ -85,11 +85,11 @@ export default function App() {
 }
 
 const SECTION_TABS = [
-  { key: 'priceComparison', label: '가격 비교', icon: '⚖️' },
   { key: 'price', label: '약가', icon: '💰' },
   { key: 'approvalReimbursement', label: '허가·보험', icon: '📋' },
   { key: 'competitors', label: '경쟁 오리지널', icon: '⚔️' },
   { key: 'generics', label: '제네릭', icon: '🏭' },
+  { key: 'priceComparison', label: '가격 비교', icon: '⚖️' },
 ]
 
 function TopBar({ activeSection, onSelect, color }) {
@@ -179,13 +179,6 @@ function PriceComparisonSection({ drug, allDrugs, copayRate, setCopayRate, compa
         </div>
         <span className="section-intro-badge">비교 기준: {drug.prices[0]?.spec ?? '대표 규격'}</span>
       </div>
-      <PriceSection
-        drug={drug}
-        copayRate={copayRate}
-        setCopayRate={setCopayRate}
-        compareItems={compareItems}
-        onToggleCompare={onToggleCompare}
-      />
       <CompetitorSection
         key={`${drug.id}-comparison`}
         drug={drug}
