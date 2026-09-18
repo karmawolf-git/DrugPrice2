@@ -130,7 +130,7 @@ export default function Sidebar({ drugs, selectedId, onSelect }) {
           <div style={{ fontWeight: 600, marginBottom: 1 }}>{apiMeta.source}</div>
           {apiMeta.lastFetched
             ? <div>갱신: {formatFetched(apiMeta.lastFetched)} KST</div>
-            : <div>기준일: 2026년 6월 1일</div>
+            : <div>기준일: 2026년 9월 1일</div>
           }
         </div>
       </div>
