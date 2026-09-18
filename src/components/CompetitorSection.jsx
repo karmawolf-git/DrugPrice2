@@ -904,11 +904,24 @@ export function CompareTray({ items, referencePrice, copayRate = 0.3, onClear })
                 {diff == null ? '비교 불가' : diff === 0 ? '동일' : `${diff > 0 ? '▲ +' : '▼ -'}${Math.abs(diff).toLocaleString('ko-KR')}원`}
                 {diff != null && referencePrice > 0 && diff !== 0 && <small>{Math.round(Math.abs(diff) / referencePrice * 100)}%</small>}
               </div>
-              <div className="compare-cost-chips">
+              <div className="compare-costs-wrap">
+                <span className="compare-costs-label">본인부담금 · {Math.round(copayRate * 100)}%</span>
+                <div className="compare-cost-chips">
                 {[30, 90, 120, 365].map(days => {
                   const copay = item.pricingStatus === '비급여' ? null : Math.round(item.insurancePrice * days * copayRate)
-                  return <span key={days} className="compare-cost-chip"><b>{days === 365 ? '1년' : `${days}일`}</b>{copay == null ? '비급여' : `${copay.toLocaleString('ko-KR')}원`}</span>
+                  const referenceCopay = item.pricingStatus === '비급여' ? null : Math.round(referencePrice * days * copayRate)
+                  const copayDiff = copay == null ? null : copay - referenceCopay
+                  return (
+                    <span key={days} className="compare-cost-chip">
+                      <b>{days === 365 ? '1년' : `${days}일`}</b>
+                      <strong>{copay == null ? '비급여' : `${copay.toLocaleString('ko-KR')}원`}</strong>
+                      {copayDiff == null || copayDiff === 0
+                        ? <small className="is-same">{copayDiff == null ? '비교 불가' : '동일'}</small>
+                        : <small className={copayDiff < 0 ? 'is-lower' : 'is-higher'}>{copayDiff < 0 ? '▼ ' : '▲ +'}{Math.abs(copayDiff).toLocaleString('ko-KR')}원</small>}
+                    </span>
+                  )
                 })}
+                </div>
               </div>
             </div>
           )
