@@ -823,13 +823,15 @@ function GenericTable({ drug, copayRate, setCopayRate, compareItems, onToggleCom
 }
 
 // ── 메인 컴포넌트 ────────────────────────────────────────────
-export default function CompetitorSection({ drug, allDrugs, copayRate = 0.3, setCopayRate, compareItems = [], onToggleCompare }) {
+export default function CompetitorSection({ drug, allDrugs, copayRate = 0.3, setCopayRate, compareItems = [], onToggleCompare, mode = 'all' }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-      {drug.competitors.length > 0 && (
+      {(mode === 'all' || mode === 'competitors') && drug.competitors.length > 0 && (
         <CompetitorTable drug={drug} allDrugs={allDrugs} copayRate={copayRate} setCopayRate={setCopayRate} compareItems={compareItems} onToggleCompare={onToggleCompare} />
       )}
-      <GenericTable drug={drug} copayRate={copayRate} setCopayRate={setCopayRate} compareItems={compareItems} onToggleCompare={onToggleCompare} />
+      {(mode === 'all' || mode === 'generics') && (
+        <GenericTable drug={drug} copayRate={copayRate} setCopayRate={setCopayRate} compareItems={compareItems} onToggleCompare={onToggleCompare} />
+      )}
     </div>
   )
 }

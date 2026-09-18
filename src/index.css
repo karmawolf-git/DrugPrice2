@@ -135,6 +135,46 @@ html, body {
   color: color-mix(in srgb, var(--tab-color) 70%, var(--text-primary));
 }
 
+.overview-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.overview-card {
+  display: flex;
+  flex-direction: column;
+  min-height: 132px;
+  padding: 18px 20px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+}
+
+.overview-card-icon {
+  font-size: 18px;
+  margin-bottom: 7px;
+}
+
+.overview-card-label {
+  color: var(--text-muted);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.overview-card-value {
+  margin-top: 5px;
+  font-size: 20px;
+  line-height: 1.25;
+}
+
+.overview-card-hint {
+  margin-top: auto;
+  color: var(--text-secondary);
+  font-size: 11px;
+}
+
 @media (max-width: 700px) {
   .product-switcher {
     top: -20px;
@@ -152,6 +192,10 @@ html, body {
 
   .product-tab {
     flex: 0 0 170px;
+  }
+
+  .overview-grid {
+    grid-template-columns: 1fr;
   }
 }
 

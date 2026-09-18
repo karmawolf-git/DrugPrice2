@@ -9,12 +9,16 @@ import DiagnosisCodePage from './components/DiagnosisCodePage.jsx'
 
 export default function App() {
   const [selectedId, setSelectedId] = useState(drugs[0].id)
+  const [activeSection, setActiveSection] = useState('overview')
   const [diagDrug, setDiagDrug] = useState(null)
   const [copayRate, setCopayRate] = useState(0.3)   // 본인부담률 (약가·경쟁품·제네릭 공유)
   const [compareItems, setCompareItems] = useState([])
   const drug = drugs.find(d => d.id === selectedId)
 
-  useEffect(() => setCompareItems([]), [selectedId])
+  useEffect(() => {
+    setCompareItems([])
+    setActiveSection('overview')
+  }, [selectedId])
 
   const toggleCompare = item => setCompareItems(prev => {
     const exists = prev.some(selected => selected.compareKey === item.compareKey)
@@ -43,42 +47,28 @@ export default function App() {
         gap: 16,
         minWidth: 0,
       }}>
-        <TopBar drug={drug} drugs={drugs} selectedId={selectedId} onSelect={setSelectedId} />
+        <TopBar activeSection={activeSection} onSelect={setActiveSection} color={drug.color} />
         <DrugHeader drug={drug} />
 
-        <PriceSection
-          drug={drug}
-          copayRate={copayRate}
-          setCopayRate={setCopayRate}
-          compareItems={compareItems}
-          onToggleCompare={toggleCompare}
-        />
-
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: '1fr 1fr',
-          gap: 16,
-        }}>
-          <ApprovalSection drug={drug} />
-          <ReimbursementSection drug={drug} onShowDiag={() => setDiagDrug(drug)} />
-        </div>
-
-        <CompetitorSection
-          key={drug.id}
+        <SectionContent
+          activeSection={activeSection}
           drug={drug}
           allDrugs={drugs}
           copayRate={copayRate}
           setCopayRate={setCopayRate}
           compareItems={compareItems}
           onToggleCompare={toggleCompare}
+          onShowDiag={() => setDiagDrug(drug)}
         />
 
-        <CompareTray
-          items={compareItems}
-          referencePrice={drug.prices[0]?.insurancePrice ?? 0}
-          copayRate={copayRate}
-          onClear={() => setCompareItems([])}
-        />
+        {(activeSection === 'competitors' || activeSection === 'generics') && (
+          <CompareTray
+            items={compareItems}
+            referencePrice={drug.prices[0]?.insurancePrice ?? 0}
+            copayRate={copayRate}
+            onClear={() => setCompareItems([])}
+          />
+        )}
 
         <footer style={{
           textAlign: 'center',
@@ -94,38 +84,101 @@ export default function App() {
   )
 }
 
-function TopBar({ drug, drugs, selectedId, onSelect }) {
+const SECTION_TABS = [
+  { key: 'overview', label: '요약', icon: '▦' },
+  { key: 'price', label: '약가', icon: '💰' },
+  { key: 'approval', label: '허가사항', icon: '📋' },
+  { key: 'reimbursement', label: '보험급여', icon: '📊' },
+  { key: 'competitors', label: '경쟁 오리지널', icon: '⚔️' },
+  { key: 'generics', label: '제네릭', icon: '🏭' },
+]
+
+function TopBar({ activeSection, onSelect, color }) {
   return (
     <div className="product-switcher">
       <div className="product-switcher-heading">
         <div>
-          <div className="product-switcher-label">제품 선택</div>
-          <div className="product-switcher-hint">비교할 제품을 선택하세요</div>
+          <div className="product-switcher-label">정보 보기</div>
+          <div className="product-switcher-hint">좌측에서 선택한 제품의 정보를 탐색하세요</div>
         </div>
-        <div className="product-switcher-current" style={{ color: drug.color }}>
-          <span className="product-switcher-dot" style={{ background: drug.color }} />
-          현재 보고 있는 제품: <strong>{drug.name}</strong>
+        <div className="product-switcher-current" style={{ color }}>
+          <span className="product-switcher-dot" style={{ background: color }} />
+          제품 선택은 좌측 사이드바에서 합니다
         </div>
       </div>
 
-      <div className="product-tabs" role="tablist" aria-label="제품 선택">
-        {drugs.map(d => {
-          const active = selectedId === d.id
+      <div className="product-tabs section-tabs" role="tablist" aria-label="제품 정보 섹션">
+        {SECTION_TABS.map(tab => {
+          const active = activeSection === tab.key
           return (
             <button
-              key={d.id}
+              key={tab.key}
               role="tab"
               aria-selected={active}
-              onClick={() => onSelect(d.id)}
+              onClick={() => onSelect(tab.key)}
               className={`product-tab${active ? ' is-active' : ''}`}
-              style={active ? { '--tab-color': d.color, '--tab-bg': d.lightColor } : {}}
+              style={active ? { '--tab-color': color, '--tab-bg': `${color}18` } : {}}
             >
-              <span className="product-tab-name">{d.name}</span>
-              <span className="product-tab-meta">{d.manufacturer}</span>
+              <span className="product-tab-name">{tab.icon} {tab.label}</span>
+              <span className="product-tab-meta">{active ? '현재 선택됨' : '열어보기'}</span>
             </button>
           )
         })}
       </div>
+    </div>
+  )
+}
+
+function SectionContent({ activeSection, drug, allDrugs, copayRate, setCopayRate, compareItems, onToggleCompare, onShowDiag }) {
+  if (activeSection === 'overview') return <OverviewSection drug={drug} />
+
+  if (activeSection === 'price') {
+    return <PriceSection
+      drug={drug}
+      copayRate={copayRate}
+      setCopayRate={setCopayRate}
+      compareItems={compareItems}
+      onToggleCompare={onToggleCompare}
+    />
+  }
+
+  if (activeSection === 'approval') return <ApprovalSection drug={drug} />
+  if (activeSection === 'reimbursement') return <ReimbursementSection drug={drug} onShowDiag={onShowDiag} />
+
+  return <CompetitorSection
+    key={`${drug.id}-${activeSection}`}
+    drug={drug}
+    allDrugs={allDrugs}
+    copayRate={copayRate}
+    setCopayRate={setCopayRate}
+    compareItems={compareItems}
+    onToggleCompare={onToggleCompare}
+    mode={activeSection}
+  />
+}
+
+function OverviewSection({ drug }) {
+  const price = drug.prices[0]
+  const criteriaCount = Array.isArray(drug.reimbursementCriteria)
+    ? drug.reimbursementCriteria.reduce((sum, section) => sum + (section.items?.length ?? 0), 0)
+    : 0
+
+  const cards = [
+    { icon: '💰', label: '대표 보험급여가', value: price?.pricingStatus === '비급여' ? '비급여' : `${price?.insurancePrice?.toLocaleString('ko-KR') ?? '-'}원`, hint: price?.spec ?? '기준 규격' },
+    { icon: '⚔️', label: '경쟁 오리지널', value: `${drug.competitors?.length ?? 0} 품목`, hint: '가격·제품 비교 가능' },
+    { icon: '🏭', label: '제네릭', value: `${drug.generics?.length ?? 0} 품목`, hint: criteriaCount ? `급여 기준 ${criteriaCount}개 항목` : '동일성분 제품' },
+  ]
+
+  return (
+    <div className="overview-grid">
+      {cards.map(card => (
+        <div className="overview-card" key={card.label}>
+          <span className="overview-card-icon">{card.icon}</span>
+          <span className="overview-card-label">{card.label}</span>
+          <strong className="overview-card-value" style={{ color: drug.color }}>{card.value}</strong>
+          <span className="overview-card-hint">{card.hint}</span>
+        </div>
+      ))}
     </div>
   )
 }
