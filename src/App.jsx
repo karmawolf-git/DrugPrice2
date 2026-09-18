@@ -87,8 +87,7 @@ export default function App() {
 const SECTION_TABS = [
   { key: 'priceComparison', label: '가격 비교', icon: '⚖️' },
   { key: 'price', label: '약가', icon: '💰' },
-  { key: 'approval', label: '허가사항', icon: '📋' },
-  { key: 'reimbursement', label: '보험급여', icon: '📊' },
+  { key: 'approvalReimbursement', label: '허가·보험', icon: '📋' },
   { key: 'competitors', label: '경쟁 오리지널', icon: '⚔️' },
   { key: 'generics', label: '제네릭', icon: '🏭' },
 ]
@@ -149,8 +148,14 @@ function SectionContent({ activeSection, drug, allDrugs, copayRate, setCopayRate
     />
   }
 
-  if (activeSection === 'approval') return <ApprovalSection drug={drug} />
-  if (activeSection === 'reimbursement') return <ReimbursementSection drug={drug} onShowDiag={onShowDiag} />
+  if (activeSection === 'approvalReimbursement') {
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+        <ApprovalSection drug={drug} />
+        <ReimbursementSection drug={drug} onShowDiag={onShowDiag} />
+      </div>
+    )
+  }
 
   return <CompetitorSection
     key={`${drug.id}-${activeSection}`}
