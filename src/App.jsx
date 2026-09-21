@@ -6,10 +6,12 @@ import ApprovalSection from './components/ApprovalSection.jsx'
 import PriceSection from './components/PriceSection.jsx'
 import CompetitorSection, { CompareTray } from './components/CompetitorSection.jsx'
 import DiagnosisCodePage from './components/DiagnosisCodePage.jsx'
+import DoseToggle from './components/DoseToggle.jsx'
 
 export default function App() {
   const [selectedId, setSelectedId] = useState(drugs[0].id)
   const [activeSection, setActiveSection] = useState('price')
+  const [doseCount, setDoseCount] = useState(1)
   const [diagDrug, setDiagDrug] = useState(null)
   const [copayRate, setCopayRate] = useState(0.3)   // 본인부담률 (약가·경쟁품·제네릭 공유)
   const [compareItems, setCompareItems] = useState([])
@@ -18,6 +20,7 @@ export default function App() {
   useEffect(() => {
     setCompareItems([])
     setActiveSection('price')
+    setDoseCount(1)
   }, [selectedId])
 
   const toggleCompare = item => setCompareItems(prev => {
@@ -58,6 +61,8 @@ export default function App() {
           setCopayRate={setCopayRate}
           compareItems={compareItems}
           onToggleCompare={toggleCompare}
+          doseCount={doseCount}
+          setDoseCount={setDoseCount}
           onShowDiag={() => setDiagDrug(drug)}
         />
 
@@ -66,6 +71,7 @@ export default function App() {
             items={compareItems}
             referencePrice={drug.prices[0]?.insurancePrice ?? 0}
             copayRate={copayRate}
+            doseCount={doseCount}
             onClear={() => setCompareItems([])}
           />
         )}
@@ -128,10 +134,12 @@ function TopBar({ activeSection, onSelect, color }) {
   )
 }
 
-function SectionContent({ activeSection, drug, allDrugs, copayRate, setCopayRate, compareItems, onToggleCompare, onShowDiag }) {
+function SectionContent({ activeSection, drug, allDrugs, copayRate, setCopayRate, compareItems, onToggleCompare, doseCount, setDoseCount, onShowDiag }) {
   if (activeSection === 'priceComparison') return <PriceComparisonSection
     drug={drug}
     compareItems={compareItems}
+    doseCount={doseCount}
+    setDoseCount={setDoseCount}
   />
 
   if (activeSection === 'price') {
@@ -141,6 +149,8 @@ function SectionContent({ activeSection, drug, allDrugs, copayRate, setCopayRate
       setCopayRate={setCopayRate}
       compareItems={compareItems}
       onToggleCompare={onToggleCompare}
+      doseCount={doseCount}
+      setDoseCount={setDoseCount}
     />
   }
 
@@ -165,7 +175,7 @@ function SectionContent({ activeSection, drug, allDrugs, copayRate, setCopayRate
   />
 }
 
-function PriceComparisonSection({ drug, compareItems }) {
+function PriceComparisonSection({ drug, compareItems, doseCount, setDoseCount }) {
   return (
     <div className="comparison-only-panel">
       <div className="section-intro">
@@ -173,7 +183,10 @@ function PriceComparisonSection({ drug, compareItems }) {
           <div className="section-intro-title">⚖️ 선택 항목 가격 비교</div>
           <div className="section-intro-text">경쟁 오리지널 또는 제네릭 탭에서 선택한 항목만 비교합니다.</div>
         </div>
-        <span className="section-intro-badge">기준 제품: {drug.name}</span>
+        <div className="section-intro-controls">
+          <DoseToggle value={doseCount} onChange={setDoseCount} color={drug.color} />
+          <span className="section-intro-badge">기준 제품: {drug.name}</span>
+        </div>
       </div>
       {!compareItems.length && (
         <div className="comparison-empty-state">

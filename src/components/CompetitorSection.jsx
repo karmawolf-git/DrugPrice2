@@ -836,14 +836,14 @@ export default function CompetitorSection({ drug, allDrugs, copayRate = 0.3, set
   )
 }
 
-export function CompareTray({ items, referencePrice, copayRate = 0.3, onClear }) {
+export function CompareTray({ items, referencePrice, copayRate = 0.3, doseCount = 1, onClear }) {
   if (!items.length) return null
 
   const pricedItems = items.filter(item => item.pricingStatus !== '비급여' && Number.isFinite(item.insurancePrice))
   const cheapest = pricedItems.length ? Math.min(...pricedItems.map(item => item.insurancePrice)) : null
   const maxSaving = cheapest != null ? referencePrice - cheapest : null
   const lowestCopay30 = pricedItems.length
-    ? Math.min(...pricedItems.map(item => Math.round(item.insurancePrice * 30 * copayRate)))
+    ? Math.min(...pricedItems.map(item => Math.round(item.insurancePrice * 30 * doseCount * copayRate)))
     : null
 
   return (
@@ -851,7 +851,7 @@ export function CompareTray({ items, referencePrice, copayRate = 0.3, onClear })
       <div className="compare-tray-header">
         <div>
           <div className="compare-tray-title">⚖️ 선택 항목 가격 비교</div>
-          <div className="compare-tray-subtitle">선택한 제품의 가격과 기준 제품 대비 차이를 비교합니다.</div>
+          <div className="compare-tray-subtitle">선택한 제품의 가격과 기준 제품 대비 차이를 비교합니다. {doseCount}정 복용 기준</div>
         </div>
         <button onClick={onClear} className="compare-tray-clear">전체 해제</button>
       </div>
@@ -908,8 +908,8 @@ export function CompareTray({ items, referencePrice, copayRate = 0.3, onClear })
                 <span className="compare-costs-label">본인부담금 · {Math.round(copayRate * 100)}%</span>
                 <div className="compare-cost-chips">
                 {[30, 90, 120, 365].map(days => {
-                  const copay = item.pricingStatus === '비급여' ? null : Math.round(item.insurancePrice * days * copayRate)
-                  const referenceCopay = item.pricingStatus === '비급여' ? null : Math.round(referencePrice * days * copayRate)
+                  const copay = item.pricingStatus === '비급여' ? null : Math.round(item.insurancePrice * days * doseCount * copayRate)
+                  const referenceCopay = item.pricingStatus === '비급여' ? null : Math.round(referencePrice * days * doseCount * copayRate)
                   const copayDiff = copay == null ? null : copay - referenceCopay
                   return (
                     <span key={days} className="compare-cost-chip">

@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from 'react'
+import React from 'react'
+import DoseToggle from './DoseToggle.jsx'
 
 function fmt(n, pricingStatus) {
   return pricingStatus === '비급여' ? '비급여' : n.toLocaleString('ko-KR') + '원'
@@ -82,9 +83,7 @@ function MiniPriceBar({ value, max, color }) {
   )
 }
 
-export default function PriceSection({ drug, copayRate, setCopayRate, compareItems = [], onToggleCompare }) {
-  const [doseCount, setDoseCount] = useState(1)
-  useEffect(() => setDoseCount(1), [drug.id])
+export default function PriceSection({ drug, copayRate, setCopayRate, compareItems = [], onToggleCompare, doseCount = 1, setDoseCount }) {
   const maxPrice = Math.max(...drug.prices.map(p => p.insurancePrice), 1)
   const copayPct = Math.round(copayRate * 100)
   return (
@@ -106,32 +105,7 @@ export default function PriceSection({ drug, copayRate, setCopayRate, compareIte
       }}>
         <span style={{ fontSize: 16 }}>💰</span>
         <span style={{ fontWeight: 700, fontSize: 14 }}>약가 정보</span>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginLeft: 8 }}>
-          <span style={{ fontSize: 11, color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>1일 복용량</span>
-          <div style={{ display: 'flex', border: '1px solid var(--border)', borderRadius: 8, overflow: 'hidden' }}>
-            {[1, 2, 3, 4].map(count => {
-              const active = count === doseCount
-              return (
-                <button
-                  key={count}
-                  onClick={() => setDoseCount(count)}
-                  aria-pressed={active}
-                  style={{
-                    padding: '4px 9px',
-                    border: 'none',
-                    borderLeft: count === 1 ? 'none' : '1px solid var(--border)',
-                    background: active ? drug.color : 'var(--surface)',
-                    color: active ? '#fff' : 'var(--text-secondary)',
-                    fontWeight: active ? 700 : 500,
-                    fontSize: 11,
-                    cursor: 'pointer',
-                    fontFamily: 'inherit',
-                  }}
-                >{count}정</button>
-              )
-            })}
-          </div>
-        </div>
+        <DoseToggle value={doseCount} onChange={setDoseCount} color={drug.color} />
         <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 6 }}>
           <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>본인부담률</span>
           <div style={{ display: 'flex', border: '1px solid var(--border)', borderRadius: 8, overflow: 'hidden' }}>
