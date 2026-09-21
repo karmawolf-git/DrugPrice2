@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 
 function fmt(n, pricingStatus) {
   return pricingStatus === '비급여' ? '비급여' : n.toLocaleString('ko-KR') + '원'
@@ -83,6 +83,8 @@ function MiniPriceBar({ value, max, color }) {
 }
 
 export default function PriceSection({ drug, copayRate, setCopayRate, compareItems = [], onToggleCompare }) {
+  const [doseCount, setDoseCount] = useState(1)
+  useEffect(() => setDoseCount(1), [drug.id])
   const maxPrice = Math.max(...drug.prices.map(p => p.insurancePrice), 1)
   const copayPct = Math.round(copayRate * 100)
   return (
@@ -104,14 +106,32 @@ export default function PriceSection({ drug, copayRate, setCopayRate, compareIte
       }}>
         <span style={{ fontSize: 16 }}>💰</span>
         <span style={{ fontWeight: 700, fontSize: 14 }}>약가 정보</span>
-        <span style={{
-          marginLeft: 8,
-          fontSize: 11,
-          color: 'var(--text-muted)',
-          padding: '2px 8px',
-          background: '#f1f5f9',
-          borderRadius: 10,
-        }}>1정(캡슐) 기준</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginLeft: 8 }}>
+          <span style={{ fontSize: 11, color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>1일 복용량</span>
+          <div style={{ display: 'flex', border: '1px solid var(--border)', borderRadius: 8, overflow: 'hidden' }}>
+            {[1, 2, 3, 4].map(count => {
+              const active = count === doseCount
+              return (
+                <button
+                  key={count}
+                  onClick={() => setDoseCount(count)}
+                  aria-pressed={active}
+                  style={{
+                    padding: '4px 9px',
+                    border: 'none',
+                    borderLeft: count === 1 ? 'none' : '1px solid var(--border)',
+                    background: active ? drug.color : 'var(--surface)',
+                    color: active ? '#fff' : 'var(--text-secondary)',
+                    fontWeight: active ? 700 : 500,
+                    fontSize: 11,
+                    cursor: 'pointer',
+                    fontFamily: 'inherit',
+                  }}
+                >{count}정</button>
+              )
+            })}
+          </div>
+        </div>
         <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 6 }}>
           <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>본인부담률</span>
           <div style={{ display: 'flex', border: '1px solid var(--border)', borderRadius: 8, overflow: 'hidden' }}>
@@ -154,7 +174,8 @@ export default function PriceSection({ drug, copayRate, setCopayRate, compareIte
           </thead>
           <tbody>
             {drug.prices.map((p, i) => {
-              const copay = Math.round(p.insurancePrice * copayRate)
+              const dosePrice = p.insurancePrice * doseCount
+              const copay = Math.round(dosePrice * copayRate)
               return (
                 <tr key={i} style={{
                   borderBottom: '1px solid var(--border)',
@@ -192,11 +213,11 @@ export default function PriceSection({ drug, copayRate, setCopayRate, compareIte
                   <Td>
                     <div>
                       <span style={{ fontWeight: 700, color: drug.color, fontSize: 15 }}>
-                        {fmt(p.insurancePrice, p.pricingStatus)}
+                        {fmt(dosePrice, p.pricingStatus)}
                       </span>
-                      <span style={{ fontSize: 11, color: 'var(--text-muted)', marginLeft: 4 }}>/{p.unit}</span>
+                      <span style={{ fontSize: 11, color: 'var(--text-muted)', marginLeft: 4 }}>/{doseCount}{p.unit}</span>
                     </div>
-                    <MiniPriceBar value={p.insurancePrice} max={maxPrice} color={drug.color} />
+                    <MiniPriceBar value={dosePrice} max={maxPrice * doseCount} color={drug.color} />
                   </Td>
                   <Td>
                     <span style={{ color: '#059669', fontWeight: 600 }}>{fmt(copay, p.pricingStatus)}</span>
@@ -213,7 +234,7 @@ export default function PriceSection({ drug, copayRate, setCopayRate, compareIte
                     }}>{p.pricingStatus === '비급여' ? '비급여' : `${100 - copayPct}%`}</span>
                   </Td>
                   <Td style={{ minWidth: 260 }}>
-                    <PrescriptionCost insurancePrice={p.insurancePrice} rate={copayRate} pricingStatus={p.pricingStatus} />
+                    <PrescriptionCost insurancePrice={dosePrice} rate={copayRate} pricingStatus={p.pricingStatus} />
                   </Td>
                 </tr>
               )
@@ -233,7 +254,7 @@ export default function PriceSection({ drug, copayRate, setCopayRate, compareIte
         <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
           <span style={{ fontSize: 13 }}>ℹ️</span>
           <span style={{ fontSize: 12, color: '#92400e' }}>
-            처방기간별 비용은 1일 1정 기준 참고값입니다. 환자 본인부담금은 선택한 본인부담률(현재 <strong>{copayPct}%</strong>) 기준이며, 기본값은 일반 외래 의원급 30%입니다. 의료기관 종별(병원 40%·종합병원 50% 등)·질환에 따라 달라지므로 상단에서 30/40/50%로 전환해 확인하세요.
+            처방기간별 비용은 선택한 1일 복용량({doseCount}정) 기준 참고값입니다. 환자 본인부담금은 선택한 본인부담률(현재 <strong>{copayPct}%</strong>) 기준이며, 기본값은 일반 외래 의원급 30%입니다. 의료기관 종별(병원 40%·종합병원 50% 등)·질환에 따라 달라지므로 상단에서 30/40/50%로 전환해 확인하세요.
           </span>
         </div>
       </div>
