@@ -87,7 +87,7 @@ export default function App() {
 const SECTION_TABS = [
   { key: 'price', label: '약가', icon: '💰' },
   { key: 'approvalReimbursement', label: '허가·보험', icon: '📋' },
-  { key: 'competitors', label: '경쟁 오리지널', icon: '⚔️' },
+  { key: 'competitors', label: '오리지널', icon: '⚔️' },
   { key: 'generics', label: '제네릭', icon: '🏭' },
   { key: 'priceComparison', label: '가격 비교', icon: '⚖️' },
 ]
