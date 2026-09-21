@@ -83,7 +83,7 @@ function MiniPriceBar({ value, max, color }) {
   )
 }
 
-export default function PriceSection({ drug, copayRate, setCopayRate, compareItems = [], onToggleCompare, doseCount = 1, setDoseCount }) {
+export default function PriceSection({ drug, copayRate, setCopayRate, compareItems = [], onToggleCompare, doseCount = 1, setDoseCount, supportsDoseToggle = false }) {
   const maxPrice = Math.max(...drug.prices.map(p => p.insurancePrice), 1)
   const copayPct = Math.round(copayRate * 100)
   return (
@@ -105,7 +105,9 @@ export default function PriceSection({ drug, copayRate, setCopayRate, compareIte
       }}>
         <span style={{ fontSize: 16 }}>💰</span>
         <span style={{ fontWeight: 700, fontSize: 14 }}>약가 정보</span>
-        <DoseToggle value={doseCount} onChange={setDoseCount} color={drug.color} />
+        {supportsDoseToggle
+          ? <DoseToggle value={doseCount} onChange={setDoseCount} color={drug.color} />
+          : <span style={{ marginLeft: 8, padding: '2px 8px', borderRadius: 10, background: '#f1f5f9', color: 'var(--text-muted)', fontSize: 11 }}>1정(캡슐) 기준</span>}
         <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 6 }}>
           <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>본인부담률</span>
           <div style={{ display: 'flex', border: '1px solid var(--border)', borderRadius: 8, overflow: 'hidden' }}>
