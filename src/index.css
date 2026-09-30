@@ -112,6 +112,17 @@ html, body {
   box-shadow: 0 3px 8px color-mix(in srgb, var(--tab-color) 18%, transparent);
 }
 
+.product-tab.is-disabled {
+  cursor: not-allowed;
+  opacity: 0.48;
+  background: var(--surface-2);
+}
+
+.product-tab.is-disabled:hover {
+  border-color: var(--border);
+  transform: none;
+}
+
 .product-tab-name,
 .product-tab-meta {
   display: block;

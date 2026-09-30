@@ -97,7 +97,7 @@ const SECTION_TABS = [
   { key: 'approvalReimbursement', label: '허가·보험', icon: '📋' },
   { key: 'competitors', label: '오리지널', icon: '⚔️' },
   { key: 'generics', label: '제네릭', icon: '🏭' },
-  { key: 'priceComparison', label: '가격 비교', icon: '⚖️' },
+  { key: 'priceComparison', label: '가격 비교', icon: '⚖️', disabled: true },
 ]
 
 function TopBar({ activeSection, onSelect, color }) {
@@ -117,13 +117,16 @@ function TopBar({ activeSection, onSelect, color }) {
       <div className="product-tabs section-tabs" role="tablist" aria-label="제품 정보 섹션">
         {SECTION_TABS.map(tab => {
           const active = activeSection === tab.key
+          const disabled = tab.disabled
           return (
             <button
               key={tab.key}
               role="tab"
               aria-selected={active}
-              onClick={() => onSelect(tab.key)}
-              className={`product-tab${active ? ' is-active' : ''}`}
+              aria-disabled={disabled}
+              disabled={disabled}
+              onClick={() => !disabled && onSelect(tab.key)}
+              className={`product-tab${active ? ' is-active' : ''}${disabled ? ' is-disabled' : ''}`}
               style={active ? { '--tab-color': color, '--tab-bg': `${color}18` } : {}}
             >
               <span className="product-tab-name">{tab.icon} {tab.label}</span>
